@@ -1,8 +1,14 @@
 
-#include "Keyboard.h"
+#include "Kb.h"
+#include <Servo.h>
+
+Servo servo; 
 
 const int buttonPinRed = 3;
 const int buttonPinGreen = 2;
+
+const int greenAngle = 26;
+const int redAngle = 126;
 
 int previousButtonRedState = HIGH; 
 int previousButtonGreenState = HIGH; 
@@ -11,31 +17,39 @@ void setup() {
   pinMode(buttonPinRed, INPUT_PULLUP);
   pinMode(buttonPinGreen, INPUT_PULLUP);
   Keyboard.begin();
+  servo.attach(A0);
+  servo.write(greenAngle); 
 }
+
 
 void loop() {
   int buttonRedState = digitalRead(buttonPinRed);
   int buttonGreenState = digitalRead(buttonPinGreen);
   if ((buttonRedState != previousButtonRedState) && (buttonRedState == LOW)) {
+    Keyboard.press(KEY_LEFT_CTRL);
     Keyboard.press(KEY_LEFT_GUI);
-    Keyboard.press('q');
+    Keyboard.press('q'); // ctrl-cmd-q: mac lock screen
     Keyboard.releaseAll();
+    servo.write(redAngle); 
   }
   if ((buttonRedState != previousButtonRedState) && (buttonRedState == HIGH)) {
-    Keyboard.println("red release");
+    // Keyboard.println("red release");
   }
   if ((buttonGreenState != previousButtonGreenState) && (buttonGreenState == LOW)) {
-    Keyboard.press(KEY_LEFT_GUI);
-    Keyboard.press(',');
+    Keyboard.press(KEY_LEFT_SHIFT); // wakeup sleeping mac
     Keyboard.releaseAll();
+    servo.write(greenAngle); 
   }
   if ((buttonGreenState != previousButtonGreenState) && (buttonGreenState == HIGH)) {
-    Keyboard.println("green release");
+    // Keyboard.println("green release");
   }
   previousButtonRedState = buttonRedState;
   previousButtonGreenState = buttonGreenState;
   delay(100);
 }
+
+int pos = 0; 
+
 
 /*
 #define KEY_LEFT_CTRL   0x80
